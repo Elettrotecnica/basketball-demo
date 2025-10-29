@@ -90,9 +90,9 @@ class HitTest {
 
 // Usage
 // Needs the master version of AFrame and the hit-test optional feature
-// Add ar-hit-test to the reticle
+// Add local-ar-hit-test to the reticle
 const hitTestCache = new Map();
-AFRAME.registerComponent("ar-hit-test", {
+AFRAME.registerComponent("local-ar-hit-test", {
 	schema: {
 		target: { type: "selector" },
 		doHitTest: { default: true }
@@ -210,9 +210,9 @@ AFRAME.registerComponent("ar-hit-test", {
 
 AFRAME.registerPrimitive('a-hit-test', {
     defaultComponents: {
-        'ar-hit-test': {}
+        'local-ar-hit-test': {}
     },
     mappings: {
-        target: 'ar-hit-test.target',
+        target: 'local-ar-hit-test.target',
     }
 });

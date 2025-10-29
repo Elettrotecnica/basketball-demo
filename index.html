@@ -95,7 +95,7 @@
 				<a-plane scale="0.6 0.6 0.6" position="0 0 1.12355" rotation="-90 0 0" width="2" height="3" static-body geometry="height: 4.37" visible="false"></a-plane>
 				<a-cone scale="0.6 0.6 0.6" position="0 0.173 -0.010" color="tomato" radius-bottom="0.25" radius-top="0.3" material="side: double; opacity:0.5; transparent: true;" geometry="height: 0.29; openEnded: true" rotation="90 0 0"></a-cone>
 			</a-entity>
-			<a-entity ar-hit-test="doHitTest:false" visible="false">
+			<a-entity local-ar-hit-test="doHitTest:false" visible="false">
 				<a-plane
 					rotation="-90 0 0"
 					width="0.2"
@@ -142,7 +142,7 @@
 			</div>
 		</div>
 		<script>
-			const reticle = document.querySelector("[ar-hit-test]");
+			const reticle = document.querySelector("[local-ar-hit-test]");
 			const hoop = document.getElementById('hoop');
 			const instructions = document.getElementById('instructions');
 			const ball = document.getElementById('ball');
@@ -186,11 +186,11 @@
 				document.body.classList.remove("inline");
 				if (scene.is("ar-mode")) {
 					document.body.classList.add("ar-preparing");
-					reticle.setAttribute('ar-hit-test', 'doHitTest:true');
+					reticle.setAttribute('local-ar-hit-test', 'doHitTest:true');
 					reticle.setAttribute('visible', 'true');
 				} else {
 					document.body.classList.add("playing");
-					reticle.setAttribute('ar-hit-test', 'doHitTest:false');
+					reticle.setAttribute('local-ar-hit-test', 'doHitTest:false');
 					reticle.setAttribute('visible', 'false');
 				}
 			});
@@ -199,7 +199,7 @@
 				document.body.classList.add("inline");
 				document.body.classList.remove("playing");
 				document.body.classList.remove("ar-preparing");
-				reticle.setAttribute('ar-hit-test', 'doHitTest:false');
+				reticle.setAttribute('local-ar-hit-test', 'doHitTest:false');
 				reticle.setAttribute('visible', 'false');
 			});
 
@@ -227,7 +227,7 @@
 					if (document.body.classList.contains("playing")) {
 						return;
 					} else {
-						if (this.components["ar-hit-test"].hasFoundAPose) {
+						if (this.components["local-ar-hit-test"].hasFoundAPose) {
 							positionHoop();
 							readyToStartPlay(e);
 						}
@@ -243,7 +243,7 @@
 				if (document.body.classList.contains("ar-preparing")) {
 					document.body.classList.remove("ar-preparing");
 					document.body.classList.add("playing");
-					reticle.setAttribute('ar-hit-test', 'doHitTest:false');
+					reticle.setAttribute('local-ar-hit-test', 'doHitTest:false');
 					reticle.setAttribute('visible', 'false');
 					return;
 				}
