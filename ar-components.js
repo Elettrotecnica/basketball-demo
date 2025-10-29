@@ -1,28 +1,5 @@
 /* global AFRAME  */
 
-AFRAME.registerComponent("hide-in-ar-mode", {
-	// Set this object invisible while in AR mode.
-	// TODO: could this be replaced with bind="visible: !ar-mode"
-	// with https://www.npmjs.com/package/aframe-state-component ?
-	init: function () {
-		this.el.sceneEl.addEventListener("enter-vr", () => {
-			if (this.el.sceneEl.is("ar-mode")) {
-				this.el.setAttribute("visible", false);
-			}
-		});
-		this.el.sceneEl.addEventListener("exit-vr", () => {
-			this.el.setAttribute("visible", true);
-		});
-	},
-});
-
-AFRAME.registerComponent("occlusion-material", {
-	update: function () {
-		this.el.components.material.material.colorWrite = false;
-	},
-});
-
-
 class HitTest {
 	constructor(renderer, options) {
 
@@ -88,11 +65,11 @@ class HitTest {
 	}
 }
 
-// Usage
-// Needs the master version of AFrame and the hit-test optional feature
-// Add ar-hit-test to the reticle
+/*
+  Custom AR component, to be set on the reticle element.
+ */
 const hitTestCache = new Map();
-AFRAME.registerComponent("ar-hit-test", {
+AFRAME.registerComponent("basketball-ar-hit-test", {
 	schema: {
 		target: { type: "selector" },
 		doHitTest: { default: true }
@@ -206,13 +183,4 @@ AFRAME.registerComponent("ar-hit-test", {
 			}
 		}
 	},
-});
-
-AFRAME.registerPrimitive('a-hit-test', {
-    defaultComponents: {
-        'ar-hit-test': {}
-    },
-    mappings: {
-        target: 'ar-hit-test.target',
-    }
 });

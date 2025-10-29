@@ -77,9 +77,9 @@
 		<script src="https://cdn.jsdelivr.net/npm/@c-frame/aframe-physics-system@4.2.3/dist/aframe-physics-system.min.js"></script>
 	</head>
 	<body class="inline">
-		<a-scene webxr="optionalFeatures: hit-test, dom-overlay; overlayElement:#overlay;" physics="debug: false">
+		<a-scene webxr="optionalFeatures: hit-test, dom-overlay; overlayElement:#overlay;" xr-mode-ui="XRMode: xr" physics="debug: false">
 			<a-sphere id="ball" dynamic-body radius="0.1" color="orange" position="0.1 2.36 -1.5"></a-sphere>
-			<a-entity id="hoop" rotation="90 0 0" position="0 2 -1.8" hide-in-ar-mode> 
+			<a-entity id="hoop" rotation="90 0 0" position="0 2 -1.8" hide-on-enter-ar>
 				<a-torus scale="0.6 0.6 0.6" position="0 0.173 -0.1" color="#43A367" radius="0.25" radius-tubular="0.005"></a-torus>
 				<a-torus scale="0.6 0.6 0.6" static-body="shape: mesh;" position="0 0.173 -0.1" visible="false" radius="0.27" radius-tubular="0.02" material="" geometry="radius: 0.29; segmentsRadial: 5; segmentsTubular: 12"></a-torus>
 				<a-plane
@@ -95,7 +95,7 @@
 				<a-plane scale="0.6 0.6 0.6" position="0 0 1.12355" rotation="-90 0 0" width="2" height="3" static-body geometry="height: 4.37" visible="false"></a-plane>
 				<a-cone scale="0.6 0.6 0.6" position="0 0.173 -0.010" color="tomato" radius-bottom="0.25" radius-top="0.3" material="side: double; opacity:0.5; transparent: true;" geometry="height: 0.29; openEnded: true" rotation="90 0 0"></a-cone>
 			</a-entity>
-			<a-entity ar-hit-test="doHitTest:false" visible="false">
+			<a-entity basketball-ar-hit-test="doHitTest:false" visible="false">
 				<a-plane
 					rotation="-90 0 0"
 					width="0.2"
@@ -104,14 +104,14 @@
 					material="transparent:true;"
 				></a-plane>
 			</a-entity>
-			<a-sky color="skyblue" hide-in-ar-mode></a-sky>
+			<a-sky color="skyblue" hide-on-enter-ar></a-sky>
 			<a-plane
 				rotation="-90 0 0"
 				width="20"
 				height="20"
 				color="#43A367"
 				static-body
-				hide-in-ar-mode
+				hide-on-enter-ar
 			></a-plane>
 			<a-camera>
 				<a-entity
@@ -142,7 +142,7 @@
 			</div>
 		</div>
 		<script>
-			const reticle = document.querySelector("[ar-hit-test]");
+			const reticle = document.querySelector("[basketball-ar-hit-test]");
 			const hoop = document.getElementById('hoop');
 			const instructions = document.getElementById('instructions');
 			const ball = document.getElementById('ball');
@@ -186,11 +186,11 @@
 				document.body.classList.remove("inline");
 				if (scene.is("ar-mode")) {
 					document.body.classList.add("ar-preparing");
-					reticle.setAttribute('ar-hit-test', 'doHitTest:true');
+					reticle.setAttribute('basketball-ar-hit-test', 'doHitTest:true');
 					reticle.setAttribute('visible', 'true');
 				} else {
 					document.body.classList.add("playing");
-					reticle.setAttribute('ar-hit-test', 'doHitTest:false');
+					reticle.setAttribute('basketball-ar-hit-test', 'doHitTest:false');
 					reticle.setAttribute('visible', 'false');
 				}
 			});
@@ -199,7 +199,7 @@
 				document.body.classList.add("inline");
 				document.body.classList.remove("playing");
 				document.body.classList.remove("ar-preparing");
-				reticle.setAttribute('ar-hit-test', 'doHitTest:false');
+				reticle.setAttribute('basketball-ar-hit-test', 'doHitTest:false');
 				reticle.setAttribute('visible', 'false');
 			});
 
@@ -227,7 +227,7 @@
 					if (document.body.classList.contains("playing")) {
 						return;
 					} else {
-						if (this.components["ar-hit-test"].hasFoundAPose) {
+						if (this.components["basketball-ar-hit-test"].hasFoundAPose) {
 							positionHoop();
 							readyToStartPlay(e);
 						}
@@ -243,7 +243,7 @@
 				if (document.body.classList.contains("ar-preparing")) {
 					document.body.classList.remove("ar-preparing");
 					document.body.classList.add("playing");
-					reticle.setAttribute('ar-hit-test', 'doHitTest:false');
+					reticle.setAttribute('basketball-ar-hit-test', 'doHitTest:false');
 					reticle.setAttribute('visible', 'false');
 					return;
 				}
