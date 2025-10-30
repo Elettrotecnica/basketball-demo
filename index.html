@@ -73,13 +73,13 @@
 
     </style>
     <script src="https://aframe.io/releases/1.7.1/aframe.min.js"></script>
-    <script src="ar-components.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@c-frame/aframe-physics-system@4.2.3/dist/aframe-physics-system.min.js"></script>
+    <script src="./ar-components.js"></script>
   </head>
   <body class="inline">
-    <a-scene webxr="optionalFeatures: hit-test, dom-overlay; overlayElement:#overlay;" xr-mode-ui="XRMode: xr" physics="debug: false">
+    <a-scene webxr="optionalFeatures: hit-test, dom-overlay; overlayElement:#overlay;" xr-mode-ui="XRMode: xr" ar-hit-test="type: map; enabled: false;" ar-track-pose physics="debug: false">
       <a-sphere id="ball" dynamic-body radius="0.1" color="orange" position="0.1 2.36 -1.5"></a-sphere>
-      <a-entity id="hoop" rotation="90 0 0" position="0 2 -1.8" hide-on-enter-ar>
+      <a-entity id="hoop" position="0 2 -1.8" rotation="90 0 0" hide-on-enter-ar>
 	<a-torus scale="0.6 0.6 0.6" position="0 0.173 -0.1" color="#43A367" radius="0.25" radius-tubular="0.005"></a-torus>
 	<a-torus scale="0.6 0.6 0.6" static-body="shape: mesh;" position="0 0.173 -0.1" visible="false" radius="0.27" radius-tubular="0.02" material="" geometry="radius: 0.29; segmentsRadial: 5; segmentsTubular: 12"></a-torus>
 	<a-plane
@@ -95,15 +95,6 @@
 	<a-plane scale="0.6 0.6 0.6" position="0 0 1.12355" rotation="-90 0 0" width="2" height="3" static-body geometry="height: 4.37" visible="false"></a-plane>
 	<a-cone scale="0.6 0.6 0.6" position="0 0.173 -0.010" color="tomato" radius-bottom="0.25" radius-top="0.3" material="side: double; opacity:0.5; transparent: true;" geometry="height: 0.29; openEnded: true" rotation="90 0 0"></a-cone>
       </a-entity>
-      <a-entity basketball-ar-hit-test="doHitTest:false" visible="false">
-	<a-plane
-	  rotation="-90 0 0"
-	  width="0.2"
-	  height="0.2"
-	  src="./arrow.png"
-	  material="transparent:true;"
-	  ></a-plane>
-      </a-entity>
       <a-sky color="skyblue" hide-on-enter-ar></a-sky>
       <a-plane
 	rotation="-90 0 0"
@@ -113,15 +104,7 @@
 	static-body
 	hide-on-enter-ar
 	></a-plane>
-      <a-camera>
-	<a-entity
-	  id="text"
-	  text="value: Hello World; align: left; width: 0.1;"
-	  position="0 0 -0.17;"
-	  visible="false"
-	  >
-	</a-entity>
-      </a-camera>
+      <a-camera></a-camera>
     </a-scene>
     <div id="overlay" class="container">
       <div id="ar-instructions">
@@ -142,115 +125,68 @@
       </div>
     </div>
     <script>
-      const reticle = document.querySelector("[basketball-ar-hit-test]");
-      const hoop = document.getElementById('hoop');
-      const instructions = document.getElementById('instructions');
-      const ball = document.getElementById('ball');
-      const button = document.getElementById('go-button');
-      const exit = document.getElementById('exit-button');
-      const upVector = new THREE.Vector3(0, 1, 0);
-      const tempVector = new THREE.Vector3();
-      const tempQuaternion = new THREE.Quaternion();
-      const scene = document.querySelector('a-scene');
+       const hoop = document.getElementById('hoop');
+       const ball = document.getElementById('ball');
+       const button = document.getElementById('go-button');
+       const exit = document.getElementById('exit-button');
+       const upVector = new THREE.Vector3(0, 1, 0);
+       const tempVector = new THREE.Vector3();
+       const tempQuaternion = new THREE.Quaternion();
+       const scene = document.querySelector('a-scene');
 
-      function hasDomOverlay(session) {
-	if (!session.domOverlayState) {
-	  // DOM Overlay is not supported
-	  return false;
-	}
+       exit.addEventListener('click', () => {
+         scene.exitVR();
+       });
 
-	if (!session.domOverlayState.type) {
-	  // DOM Overlay is not in use
-	  return false;
-	}
+       scene.addEventListener("enter-vr", () => {
+         document.body.classList.remove("inline");
+         if (scene.is("ar-mode")) {
+           document.body.classList.add("ar-preparing");
+           scene.setAttribute("ar-hit-test", "enabled", true);
+         } else {
+           document.body.classList.add("playing");
+         }
+       });
 
-	return true;
-      }
+       scene.addEventListener("exit-vr", () => {
+         document.body.classList.add("inline");
+         document.body.classList.remove("playing");
+         document.body.classList.remove("ar-preparing");
+       });
 
-      function positionHoop() {
-	hoop.setAttribute("position", reticle.getAttribute("position"));
-	hoop.setAttribute("visible", true);
-	tempVector.set(0, 0 ,-1);
-	tempVector.applyQuaternion(reticle.object3D.quaternion);
-	tempQuaternion.setFromUnitVectors(tempVector, upVector);
-	hoop.object3D.quaternion.multiplyQuaternions(tempQuaternion, reticle.object3D.quaternion);
-      };
+       scene.addEventListener("ar-hit-test-select", (e) => {
+         if (document.body.classList.contains("ar-preparing")) {
+           /* We are positioning the hoop */
+           hoop.object3D.position.copy(e.detail.position);
+           hoop.object3D.visible = true;
+           tempVector.set(0, 0 ,-1);
+           tempVector.applyQuaternion(e.detail.orientation);
+           tempQuaternion.setFromUnitVectors(tempVector, upVector);
+           hoop.object3D.quaternion.multiplyQuaternions(tempQuaternion, e.detail.orientation);
+         }
+       });
 
-      exit.addEventListener('click', function () {
-	scene.xrSession.end();
-      });
+       scene.addEventListener("ar-track-pose-select", (e) => {
+         if (document.body.classList.contains("playing")) {
+           /* We are throwing the ball */
+           ball.body.position.copy(e.detail.pose.transform.position);
+           tempVector.set(0, 0 ,-5);
+           tempVector.applyQuaternion(e.detail.pose.transform.orientation);
+           ball.body.velocity.copy(tempVector);
+         }
+       });
 
-      scene.addEventListener("enter-vr", () => {
-	const domOverlay = hasDomOverlay(scene.xrSession);
-	document.getElementById('text').setAttribute('text', 'value', 'Overlay: ' + domOverlay);
-	document.body.classList.remove("inline");
-	if (scene.is("ar-mode")) {
-	  document.body.classList.add("ar-preparing");
-	  reticle.setAttribute('basketball-ar-hit-test', 'doHitTest:true');
-	  reticle.setAttribute('visible', 'true');
-	} else {
-	  document.body.classList.add("playing");
-	  reticle.setAttribute('basketball-ar-hit-test', 'doHitTest:false');
-	  reticle.setAttribute('visible', 'false');
-	}
-      });
+       function readyToStartPlay(e) {
+         e.preventDefault();
+         if (document.body.classList.contains("ar-preparing")) {
+           document.body.classList.remove("ar-preparing");
+           document.body.classList.add("playing");
+           scene.setAttribute("ar-hit-test", "enabled", false);
+         }
+       }
 
-      scene.addEventListener("exit-vr", () => {
-	document.body.classList.add("inline");
-	document.body.classList.remove("playing");
-	document.body.classList.remove("ar-preparing");
-	reticle.setAttribute('basketball-ar-hit-test', 'doHitTest:false');
-	reticle.setAttribute('visible', 'false');
-      });
-
-      reticle.addEventListener('select', function (e) {
-	const domOverlay = hasDomOverlay(scene.xrSession);
-	if (document.body.classList.contains("playing")) {
-	  const pose = e.detail.pose;
-	  ball.body.position.copy(pose.transform.position);
-	  // ball.body.position.y += 0.2;
-	  tempVector.set(0, 0 ,-5);
-	  tempVector.applyQuaternion(pose.transform.orientation);
-	  ball.body.velocity.copy(tempVector);
-	  return;
-	}
-
-	if (domOverlay) {
-	  setTimeout(() => {
-	    if (document.body.classList.contains("playing")) {
-	      return;
-	    } else {
-	      positionHoop();
-	    }
-	  }, 50);
-	} else {
-	  if (document.body.classList.contains("playing")) {
-	    return;
-	  } else {
-	    if (this.components["basketball-ar-hit-test"].hasFoundAPose) {
-	      positionHoop();
-	      readyToStartPlay(e);
-	    }
-	  }
-	}
-      });
-
-      function readyToStartPlay(e) {
-	e.preventDefault();
-	if (hoop.getAttribute("visible") === false) {
-	  positionHoop();
-	}
-	if (document.body.classList.contains("ar-preparing")) {
-	  document.body.classList.remove("ar-preparing");
-	  document.body.classList.add("playing");
-	  reticle.setAttribute('basketball-ar-hit-test', 'doHitTest:false');
-	  reticle.setAttribute('visible', 'false');
-	  return;
-	}
-      }
-
-      button.addEventListener('mousedown', readyToStartPlay);
-      button.addEventListener('touchstart', readyToStartPlay);
+       button.addEventListener('mousedown', readyToStartPlay);
+       button.addEventListener('touchstart', readyToStartPlay);
     </script>
   </body>
 </html>
