@@ -73,15 +73,15 @@
 
     </style>
     <script src="https://aframe.io/releases/1.7.1/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/Elettrotecnica/aframe-rapier-physics@5.4.2/aframe-rapier.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@c-frame/aframe-physics-system@4.2.3/dist/aframe-physics-system.min.js"></script>
     <script src="./ar-components.js"></script>
   </head>
   <body class="inline">
     <a-scene webxr="optionalFeatures: hit-test, dom-overlay; overlayElement:#overlay;" xr-mode-ui="XRMode: xr" ar-hit-test="type: map; enabled: false;" ar-track-pose physics="debug: false">
-      <a-sphere id="ball" rapier-body rapier-shape radius="0.1" color="orange" position="0.1 2.36 -1.5"></a-sphere>
+      <a-sphere id="ball" dynamic-body radius="0.1" color="orange" position="0.1 2.36 -1.5"></a-sphere>
       <a-entity id="hoop" position="0 2 -1.8" rotation="90 0 0" hide-on-enter-ar>
 	<a-torus scale="0.6 0.6 0.6" position="0 0.173 -0.1" color="#43A367" radius="0.25" radius-tubular="0.005"></a-torus>
-	<a-torus scale="0.6 0.6 0.6" rapier-body="type: Fixed" rapier-shape="shape: TriMesh" position="0 0.173 -0.1" visible="false" radius="0.27" radius-tubular="0.02" material="" geometry="radius: 0.29; segmentsRadial: 5; segmentsTubular: 12"></a-torus>
+	<a-torus scale="0.6 0.6 0.6" static-body="shape: mesh;" position="0 0.173 -0.1" visible="false" radius="0.27" radius-tubular="0.02" material="" geometry="radius: 0.29; segmentsRadial: 5; segmentsTubular: 12"></a-torus>
 	<a-plane
 	  scale="0.6 0.6 0.6"
 	  position="0 0 -0.3"
@@ -90,10 +90,9 @@
 	  height="0.9"
 	  material="transparent: true; side: double;"
 	  src="./backboard.png"
-	  rapier-body="type: Fixed"
-          rapier-shape
+	  static-body
 	  ></a-plane>
-	<a-plane scale="0.6 0.6 0.6" position="0 0 1.12355" rotation="-90 0 0" width="2" height="3" rapier-body="type: Fixed" rapier-shape geometry="height: 4.37" visible="false"></a-plane>
+	<a-plane scale="0.6 0.6 0.6" position="0 0 1.12355" rotation="-90 0 0" width="2" height="3" static-body geometry="height: 4.37" visible="false"></a-plane>
 	<a-cone scale="0.6 0.6 0.6" position="0 0.173 -0.010" color="tomato" radius-bottom="0.25" radius-top="0.3" material="side: double; opacity:0.5; transparent: true;" geometry="height: 0.29; openEnded: true" rotation="90 0 0"></a-cone>
       </a-entity>
       <a-sky color="skyblue" hide-on-enter-ar></a-sky>
@@ -102,7 +101,7 @@
 	width="20"
 	height="20"
 	color="#43A367"
-	rapier-body="type: Fixed" rapier-shape
+	static-body
 	hide-on-enter-ar
 	></a-plane>
       <a-camera></a-camera>
